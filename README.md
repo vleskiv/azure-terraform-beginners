@@ -1,2 +1,2 @@
-# azure-terraform-beginners
+# azure-terraform
 Beginners Guide to Terraforming Azure
