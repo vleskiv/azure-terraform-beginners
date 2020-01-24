@@ -14,7 +14,7 @@
 # You can find a complete list of Azure resources supported by Terraform here:
 # https://www.terraform.io/docs/providers/azurerm/
 resource "azurerm_resource_group" "tf_azure_guide" {
-  name     = "${var.resource_group}"
+  name     = "${var.prefix}-${var.resource_group}"
   location = "${var.location}"
 }
 
@@ -25,7 +25,7 @@ resource "azurerm_resource_group" "tf_azure_guide" {
 # works visually, run `terraform graph` and copy the output into the online
 # GraphViz tool: http://www.webgraphviz.com/
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.virtual_network_name}"
+  name                = "${var.prefix}-${var.virtual_network_name}"
   location            = "${azurerm_resource_group.tf_azure_guide.location}"
   address_space       = ["${var.address_space}"]
   resource_group_name = "${azurerm_resource_group.tf_azure_guide.name}"
@@ -99,6 +99,12 @@ resource "azurerm_network_interface" "tf-guide-nic" {
   }
 }
 
+resource "random_string" "dns_suffix" {
+  length = 4
+  special = false
+  upper = false
+}
+
 # Every Azure Virtual Machine comes with a private IP address. You can also 
 # optionally add a public IP address for Internet-facing applications and 
 # demo environments like this one.
@@ -107,7 +113,7 @@ resource "azurerm_public_ip" "tf-guide-pip" {
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.tf_azure_guide.name}"
   public_ip_address_allocation = "Dynamic"
-  domain_name_label            = "${var.hostname}"
+  domain_name_label            = "${var.hostname}-${random_string.dns_suffix.result}"
 }
 
 # And finally we build our virtual machine. This is a standard Ubuntu instance.
