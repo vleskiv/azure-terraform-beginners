@@ -14,7 +14,7 @@
 # You can find a complete list of Azure resources supported by Terraform here:
 # https://www.terraform.io/docs/providers/azurerm/
 resource "azurerm_resource_group" "tf_azure_guide" {
-  name     = "${var.prefix}-${var.resource_group}"
+  name     = "${local.prefix_random}-${var.resource_group}"
   location = "${var.location}"
 }
 
@@ -25,7 +25,7 @@ resource "azurerm_resource_group" "tf_azure_guide" {
 # works visually, run `terraform graph` and copy the output into the online
 # GraphViz tool: http://www.webgraphviz.com/
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.prefix}-${var.virtual_network_name}"
+  name                = "${local.prefix_random}-${var.virtual_network_name}"
   location            = "${azurerm_resource_group.tf_azure_guide.location}"
   address_space       = ["${var.address_space}"]
   resource_group_name = "${azurerm_resource_group.tf_azure_guide.name}"
@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "vnet" {
 # default variables in the variables.tf file. You can customize this demo by
 # making a copy of the terraform.tfvars.example file.
 resource "azurerm_subnet" "subnet" {
-  name                 = "${var.prefix}subnet"
+  name                 = "${local.prefix_random}subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name  = "${azurerm_resource_group.tf_azure_guide.name}"
   address_prefix       = "${var.subnet_prefix}"
@@ -54,7 +54,7 @@ resource "azurerm_subnet" "subnet" {
 
 # Security group to allow inbound access on port 80 (http) and 22 (ssh)
 resource "azurerm_network_security_group" "tf-guide-sg" {
-  name                = "${var.prefix}-sg"
+  name                = "${local.prefix_random}-sg"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.tf_azure_guide.name}"
 
@@ -86,13 +86,13 @@ resource "azurerm_network_security_group" "tf-guide-sg" {
 # A network interface. This is required by the azurerm_virtual_machine 
 # resource. Terraform will let you know if you're missing a dependency.
 resource "azurerm_network_interface" "tf-guide-nic" {
-  name                      = "${var.prefix}tf-guide-nic"
+  name                      = "${local.prefix_random}tf-guide-nic"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.tf_azure_guide.name}"
   network_security_group_id = "${azurerm_network_security_group.tf-guide-sg.id}"
 
   ip_configuration {
-    name                          = "${var.prefix}ipconfig"
+    name                          = "${local.prefix_random}ipconfig"
     subnet_id                     = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.tf-guide-pip.id}"
@@ -105,11 +105,15 @@ resource "random_string" "dns_suffix" {
   upper = false
 }
 
+locals {
+  prefix_random = "${var.prefix}-${random_string.dns_suffix.result}"
+}
+
 # Every Azure Virtual Machine comes with a private IP address. You can also 
 # optionally add a public IP address for Internet-facing applications and 
 # demo environments like this one.
 resource "azurerm_public_ip" "tf-guide-pip" {
-  name                         = "${var.prefix}-ip"
+  name                         = "${local.prefix_random}-ip"
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.tf_azure_guide.name}"
   public_ip_address_allocation = "Dynamic"

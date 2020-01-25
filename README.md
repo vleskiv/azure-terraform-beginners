@@ -12,13 +12,17 @@ az account list
 
 # Usage (flat file)
 ```bash
-export MY_PREFIX="tfguide"
 terraform init
 # Module documentation: .terraform\modules\<random_id>\Azure-terraform-azurerm-compute-5b4096c\README.md
-terraform apply \
-	-var="prefix=$MY_PREFIX" \
+
+terraform plan \
 	-var="vm_size=Standard_B1s" \
 	-var="admin_password=My-long-pwd"
+
+terraform apply \
+	-var="vm_size=Standard_B1s" \
+	-var="admin_password=My-long-pwd"
+
 terraform destroy
 ```
 
@@ -26,7 +30,7 @@ terraform destroy
 - Rename `module.tf.disabled` > `module.tf`
 - Check that you have default ssh key for linux VM `~/.ssh/id_rsa.pub`. If not - generate it:
 ```
-ssh-keygen -t rsa -b 4096 -C $USER@example.com
+ssh-keygen -t rsa -b 4096 -C username@example.com
 ```
 - Apply terraform: see previous step "Usage (flat file)"
 
