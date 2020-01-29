@@ -37,7 +37,10 @@ terraform destroy
 
 # Usage (flat file + module)
 - Rename `module.tf.disabled` > `module.tf`
-- Check that you have default ssh key for linux VM `~/.ssh/id_rsa.pub`. If not - generate it:
+- Check that you have default ssh key:
+for linux `~/.ssh/id_rsa.pub`.
+for windows `C:\Users\%USER%/.ssh/id_rsa.`
+If not - generate it:
 ```
 ssh-keygen -t rsa -b 4096 -C username@example.com
 ```

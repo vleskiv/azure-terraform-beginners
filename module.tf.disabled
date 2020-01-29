@@ -21,7 +21,7 @@
     allow_ssh_traffic   = "true"
     resource_group_name = "${azurerm_resource_group.tf_azure_guide.name}"
     vnet_name           = "${local.prefix_random}-linux-vnet"
-    sg_name             = "${local.prefix_random}-sg"
+    sg_name             = "${local.prefix_random}-linux-sg"
   }
 
   output "linux_vm_public_name"{
