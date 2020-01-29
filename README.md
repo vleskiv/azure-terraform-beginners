@@ -5,10 +5,15 @@ Beginners Guide to Terraforming Azure
 
 # Authentication
 ```bash
+# Install azure-cli
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-az login
+# Authorize azure-cli using your account
+az login 
+# Set the subscription
+az account set --subscription <subscription name>
+# Check that "isDefault": true corresponds to the subscription above
 az account list
-# az account set -s <Subscription ID>
+# List available SKU's
 # az vm list-skus --location centralus --size Standard_A --output table
 ```
 
@@ -18,10 +23,12 @@ terraform init
 # Module documentation: .terraform\modules\<random_id>\Azure-terraform-azurerm-compute-5b4096c\README.md
 
 terraform plan \
+        -var="prefix=<YOUR_UNIQUE_SLB_USERNAME>" \
 	-var="vm_size=Standard_B1s" \
 	-var="admin_password=My-long-pwd"
 
 terraform apply \
+        -var="prefix=<YOUR_UNIQUE_SLB_USERNAME>" \
 	-var="vm_size=Standard_B1s" \
 	-var="admin_password=My-long-pwd"
 

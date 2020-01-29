@@ -37,7 +37,7 @@ resource "azurerm_virtual_network" "vnet" {
 # default variables in the variables.tf file. You can customize this demo by
 # making a copy of the terraform.tfvars.example file.
 resource "azurerm_subnet" "subnet" {
-  name                 = "${local.prefix_random}subnet"
+  name                 = "${local.prefix_random}-subnet"
   virtual_network_name = "${azurerm_virtual_network.vnet.name}"
   resource_group_name  = "${azurerm_resource_group.tf_azure_guide.name}"
   address_prefix       = "${var.subnet_prefix}"
@@ -86,13 +86,13 @@ resource "azurerm_network_security_group" "tf-guide-sg" {
 # A network interface. This is required by the azurerm_virtual_machine 
 # resource. Terraform will let you know if you're missing a dependency.
 resource "azurerm_network_interface" "tf-guide-nic" {
-  name                      = "${local.prefix_random}tf-guide-nic"
+  name                      = "${local.prefix_random}-nic"
   location                  = "${var.location}"
   resource_group_name       = "${azurerm_resource_group.tf_azure_guide.name}"
   network_security_group_id = "${azurerm_network_security_group.tf-guide-sg.id}"
 
   ip_configuration {
-    name                          = "${local.prefix_random}ipconfig"
+    name                          = "${local.prefix_random}-ipconfig"
     subnet_id                     = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = "${azurerm_public_ip.tf-guide-pip.id}"
@@ -117,7 +117,7 @@ resource "azurerm_public_ip" "tf-guide-pip" {
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.tf_azure_guide.name}"
   public_ip_address_allocation = "Dynamic"
-  domain_name_label            = "${var.hostname}-${random_string.dns_suffix.result}"
+  domain_name_label            = "${local.prefix_random}"
 }
 
 # And finally we build our virtual machine. This is a standard Ubuntu instance.
@@ -125,7 +125,7 @@ resource "azurerm_public_ip" "tf-guide-pip" {
 # the demo environment. Terraform supports several different types of 
 # provisioners including Bash, Powershell and Chef.
 resource "azurerm_virtual_machine" "site" {
-  name                = "${var.hostname}-site"
+  name                = "${local.prefix_random}-site"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.tf_azure_guide.name}"
   vm_size             = "${var.vm_size}"
@@ -141,14 +141,14 @@ resource "azurerm_virtual_machine" "site" {
   }
 
   storage_os_disk {
-    name              = "${var.hostname}-osdisk"
+    name              = "${local.prefix_random}-osdisk"
     managed_disk_type = "Standard_LRS"
     caching           = "ReadWrite"
     create_option     = "FromImage"
   }
 
   os_profile {
-    computer_name  = "${var.hostname}"
+    computer_name  = "${local.prefix_random}"
     admin_username = "${var.admin_username}"
     admin_password = "${var.admin_password}"
   }
